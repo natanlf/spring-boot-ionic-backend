@@ -3,10 +3,12 @@ package com.natanlf.cursomc.services;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import com.natanlf.cursomc.domain.Categoria;
 import com.natanlf.cursomc.repositories.CategoriaRepository;
+import com.natanlf.cursomc.services.exceptions.DataIntegrityException;
 import com.natanlf.cursomc.services.exceptions.ObjectNotFoundException;
 
 @Service
@@ -28,5 +30,14 @@ public class CategoriaService {
 	public Categoria update(Categoria obj) {
 		find(obj.getId()); //se não encontrar esse id, já lança uma exceção e não continua
 		return repo.save(obj); //save or update, quando o id é nulo insere, quando não é atualiza
+	}
+	
+	public void delete(Integer id) {
+		find(id); //se não encontrar já retorna uam exception
+		try {
+			repo.deleteById(id);
+		} catch (DataIntegrityViolationException e) {
+			throw new DataIntegrityException("Não é possível deletar uma categoria que possui produtos");
+		}
 	}
 }
