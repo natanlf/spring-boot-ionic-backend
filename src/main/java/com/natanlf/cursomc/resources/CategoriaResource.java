@@ -24,8 +24,8 @@ public class CategoriaResource {
 	private CategoriaService service;
 	
 	@RequestMapping(value="/{id}",method=RequestMethod.GET) //recebe o id enviado
-	public ResponseEntity<?> find(@PathVariable Integer id) { //@PathVariable para receber o id enviado		
-		Categoria obj = service.buscar(id);
+	public ResponseEntity<Categoria> find(@PathVariable Integer id) { //@PathVariable para receber o id enviado		
+		Categoria obj = service.find(id);
 		return ResponseEntity.ok().body(obj); //tenho como retorno o objeto e  ok é para dizer se foi tudo certo
 	}
 	
@@ -37,5 +37,12 @@ public class CategoriaResource {
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
 				.path("/{id}").buildAndExpand(obj.getId()).toUri(); //assim temos a url de requisição
 		return ResponseEntity.created(uri).build();
+	}
+	
+	@RequestMapping(value="/{id}" ,method=RequestMethod.PUT)
+	public ResponseEntity<Void> update(@RequestBody Categoria obj, @PathVariable Integer id){
+		obj.setId(id); //garantindo que vai atualizar a categoria com o id passado
+		obj = service.update(obj);
+		return ResponseEntity.noContent().build();
 	}
 }
