@@ -1,5 +1,6 @@
 package com.natanlf.cursomc.resources;
 
+import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,9 +15,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.natanlf.cursomc.domain.Categoria;
 import com.natanlf.cursomc.domain.Cliente;
 import com.natanlf.cursomc.dto.ClienteDTO;
+import com.natanlf.cursomc.dto.ClienteNewDTO;
 import com.natanlf.cursomc.services.ClienteService;
 
 @RestController
@@ -62,5 +66,15 @@ public class ClienteResource {
 		Page<Cliente> list = service.findPage(page, linesPerPage, orderBy, direction);
 		Page<ClienteDTO> listDTO = list.map(obj -> new ClienteDTO(obj)); //Convertemos cada objeto da lista para DTO
 		return ResponseEntity.ok().body(listDTO); //retorna uma lista de categorias
+	}
+	
+	@RequestMapping(method=RequestMethod.POST)
+	public ResponseEntity<Void> insert(@Valid @RequestBody ClienteNewDTO objDto){ // http de resposta é 201 para inserção, RequestBody faz o json ser convertido para objeto java	
+		Cliente obj = service.fromDTO(objDto);
+		obj =service.insert(obj); //a operação save retorna um objeto	
+		
+		URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
+				.path("/{id}").buildAndExpand(obj.getId()).toUri(); //assim temos a url de requisição
+		return ResponseEntity.created(uri).build();
 	}
 }
