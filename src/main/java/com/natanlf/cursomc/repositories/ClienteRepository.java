@@ -8,4 +8,6 @@ import com.natanlf.cursomc.domain.Cliente;
 @Repository
 public interface ClienteRepository extends JpaRepository<Cliente, Integer> { //realiza operações de acesso a dados
 
+	//Busca um cliente passando um email como argumento
+	Cliente findByEmail(String email);
 }
