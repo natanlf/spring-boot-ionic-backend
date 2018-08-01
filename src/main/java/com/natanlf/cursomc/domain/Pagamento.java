@@ -11,11 +11,15 @@ import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.natanlf.cursomc.domain.enums.EstadoPagamento;
 
 @Entity
 @Inheritance(strategy=InheritanceType.JOINED) //mapeando herança. Fazendo uma tabela para cda classe
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type") 
 public class Pagamento implements Serializable {
+	//JsonTypeInfo serve para informar a minha classe abstrata(Pagamento), 
+	//qual sub classe vou instanciar, se é a PagamentoComCartão ou PagamentoComBoleto
 	
 	private static final long serialVersionUID = 1L;
 
