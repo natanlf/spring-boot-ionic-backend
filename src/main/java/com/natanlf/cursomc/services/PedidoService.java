@@ -15,7 +15,6 @@ import com.natanlf.cursomc.domain.enums.EstadoPagamento;
 import com.natanlf.cursomc.repositories.ItemPedidoRepository;
 import com.natanlf.cursomc.repositories.PagamentoRepository;
 import com.natanlf.cursomc.repositories.PedidoRepository;
-import com.natanlf.cursomc.repositories.ProdutoRepository;
 import com.natanlf.cursomc.services.exceptions.ObjectNotFoundException;
 
 @Service
@@ -36,6 +35,9 @@ public class PedidoService {
 	@Autowired
 	private ItemPedidoRepository itemPedidoRepository;
 	
+	@Autowired
+	private ClienteService clienteService;
+	
 	public Pedido buscar(Integer id) {
 		Optional<Pedido> obj = repo.findById(id);
 		return obj.orElseThrow(() -> new ObjectNotFoundException("Objeto não encontrado! Id: " + id + ", Tipo: " + Pedido.class.getName(), null)); 
@@ -45,6 +47,7 @@ public class PedidoService {
 	public Pedido insert(Pedido obj) {
 		obj.setId(null);
 		obj.setInstante(new Date());
+		obj.setCliente(clienteService.find(obj.getCliente().getId())); //busca o cliente através do id do cliente passado na inserção do pedido pelo json
 		obj.getPagamento().setEstado(EstadoPagamento.PENDENTE);
 		obj.getPagamento().setPedido(obj);
 		if(obj.getPagamento() instanceof PagamentoComBoleto) {
@@ -56,10 +59,12 @@ public class PedidoService {
 		
 		for (ItemPedido ip : obj.getItens()) {
 			ip.setDesconto(0.0);
-			ip.setPreco(produtoService.buscar(ip.getProduto().getId()).getPreco());
+			ip.setProduto(produtoService.buscar(ip.getProduto().getId())); //busco o produto através de seu id passado na inserção do pedido
+			ip.setPreco(ip.getProduto().getPreco()); //como o produto já foi setado, pego seu preço
 			ip.setPedido(obj);
 		}
 		itemPedidoRepository.saveAll(obj.getItens());
+		System.out.println(obj); //quando coloco um objeto dentro do system.out, automaticamente vai ser chamado o toString()
 		return obj;
 	}
 }
