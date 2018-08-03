@@ -9,6 +9,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
 import com.natanlf.cursomc.services.DBService;
+import com.natanlf.cursomc.services.EmailService;
+import com.natanlf.cursomc.services.SmtpEmailService;
 
 //Como na classe Application.propeties está com o profile test ativo, essa classe será usada
 @Configuration
@@ -31,5 +33,10 @@ public class DevConfig {
 		
 		dbService.instantiateTestDatabase(); //instancio a classe que popula o banco
 		return true;
+	}
+	
+	@Bean
+	public EmailService emailService() { //Para poder enviar o email
+		return new SmtpEmailService();
 	}
 }
