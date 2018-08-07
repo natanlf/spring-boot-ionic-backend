@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -24,6 +25,7 @@ import com.natanlf.cursomc.security.JWTUtil;
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true) 
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	@Autowired
@@ -45,6 +47,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			"/clientes/**"
 	};
 	
+	private static final String[] PUBLIC_MATCHERS_POST = { //Acesso de leitura
+			"/clientes/**"
+	};
+	
 	@Override
 	public void configure(HttpSecurity http) throws Exception {
 		
@@ -56,6 +62,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		//chama as configurações de cors que o método abaixo implementa
 		http.cors().and().csrf().disable(); //Como não armazenamos sessão o csrf fica desabilitado
 		http.authorizeRequests()
+		.antMatchers(HttpMethod.POST, PUBLIC_MATCHERS_POST).permitAll()
 		.antMatchers(HttpMethod.GET, PUBLIC_MATCHERS_GET).permitAll() //Só permite métodos de leitura
 		.antMatchers(PUBLIC_MATCHERS).permitAll()//todos os caminhos que estiverem no meu vetor acima, ou permitir o acesso
 		.anyRequest().authenticated(); //todos os outros caminhos é exigido autenticação
