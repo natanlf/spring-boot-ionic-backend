@@ -6,8 +6,12 @@ import java.util.Optional;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
+import com.natanlf.cursomc.domain.Cliente;
 import com.natanlf.cursomc.domain.ItemPedido;
 import com.natanlf.cursomc.domain.PagamentoComBoleto;
 import com.natanlf.cursomc.domain.Pedido;
@@ -15,6 +19,8 @@ import com.natanlf.cursomc.domain.enums.EstadoPagamento;
 import com.natanlf.cursomc.repositories.ItemPedidoRepository;
 import com.natanlf.cursomc.repositories.PagamentoRepository;
 import com.natanlf.cursomc.repositories.PedidoRepository;
+import com.natanlf.cursomc.security.UserSS;
+import com.natanlf.cursomc.services.exceptions.AuthorizationException;
 import com.natanlf.cursomc.services.exceptions.ObjectNotFoundException;
 
 @Service
@@ -71,5 +77,17 @@ public class PedidoService {
 		itemPedidoRepository.saveAll(obj.getItens());
 		emailService.sendOrderConfirmationHtmlEmail(obj); //envio de email
 		return obj;
+	}
+	
+	public Page<Pedido> findPage(Integer page, Integer linesPerPage, String orderBy, String direction){
+		
+		UserSS user = UserService.authenticated();
+		if(user==null) { //se estiver nulo então o usuário não está autenticado
+			throw new AuthorizationException("Acesso negado");
+		}
+		PageRequest pageRequest = PageRequest.of(page, linesPerPage, Direction.valueOf(direction), orderBy);
+		//vou retornar somente os pedidos do cliente que está logado
+		Cliente cliente = clienteService.find(user.getId());
+		return repo.findByCliente(cliente, pageRequest);
 	}
 }
