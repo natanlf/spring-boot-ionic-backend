@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.natanlf.cursomc.domain.Cliente;
@@ -77,6 +78,12 @@ public class ClienteResource {
 		
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
 				.path("/{id}").buildAndExpand(obj.getId()).toUri(); //assim temos a url de requisição
+		return ResponseEntity.created(uri).build();
+	}
+	
+	@RequestMapping(value="/picture", method=RequestMethod.POST)
+	public ResponseEntity<Void> uploadProfilePicture(@RequestParam MultipartFile file){ // http de resposta é 201 para inserção, RequestBody faz o json ser convertido para objeto java	
+		URI uri = service.uploadProfilePicture(file);
 		return ResponseEntity.created(uri).build();
 	}
 }
