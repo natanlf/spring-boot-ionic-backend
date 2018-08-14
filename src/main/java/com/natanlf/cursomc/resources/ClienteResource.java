@@ -71,6 +71,12 @@ public class ClienteResource {
 		return ResponseEntity.ok().body(listDTO); //retorna uma lista de categorias
 	}
 	
+	@RequestMapping(value="/email", method=RequestMethod.GET)
+	public ResponseEntity<Cliente> find(@RequestParam(value="value") String email) {
+		Cliente obj = service.findByEmail(email);
+		return ResponseEntity.ok().body(obj);
+	}
+	
 	@RequestMapping(method=RequestMethod.POST)
 	public ResponseEntity<Void> insert(@Valid @RequestBody ClienteNewDTO objDto){ // http de resposta é 201 para inserção, RequestBody faz o json ser convertido para objeto java	
 		Cliente obj = service.fromDTO(objDto);
